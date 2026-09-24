@@ -1,46 +1,54 @@
-# 📊 Exploratory Data Analysis of Diabetes Risk Factors
-This repository provides an end-to-end framework for analyzing clinical and demographic risk factors associated with diabetes onset across 50,000 patient records.It features non-destructive data cleaning, clinical feature engineering, and interactive visualizations.
+# 📊 Exploratory Data Analysis (EDA) of Diabetes Risk Factors
+An end-to-end clinical data analysis and visualization framework operating on 50,000 patient records. This project evaluates key physiological, demographic, and metabolic markers—specifically Blood Glucose, HbA1c, BMI, and Age—to uncover early indicators of prediabetes and diabetes onset.
 ---
 
 ## 📌 Table of Contents
 - [Project Overview]
-- [Key Features & Methodology]
-- [Tech Stack]
-- [Project Workflow]
-- [Executive Insights]
-- 
-  ---
-
+- [Dataset Architecture]
+- [Key Methodology & Data Cleaning]
+- [Tech Stack & Libraries]
+- [Project Execution Phases]
+- [Detailed Key Insights]
+- [Future Scope]
+ 
 ## 🎯 Project Overview
-The objective of this project is to perform an end-to-end exploratory data analysis (EDA) to uncover how key indicators like Age, BMI, Blood Glucose, and HbA1c interact to signal diabetes risk.
+Early detection of diabetes significantly improves patient outcomes and reduces long-term healthcare costs. The primary goal of this Exploratory Data Analysis (EDA) project is to rigorously clean, transform, and analyze clinical metrics to construct a clear risk-stratification profile for patients.
 
-- **Dataset Size:** 50,000 patient records
-- **Data Quality:** Zero missing values, non-destructive IQR outlier capping via .clip()
-- **Feature Engineering:** Categorical clinical binning via pd.cut()
-  ---
-## 🛠️ Tech Stack & Tools
--**Language:** Python
-- **Data Analytics:** Pandas, NumPy
-- **Visualizations:** Matplotlib, Seaborn (Static Baseline), Plotly Express (Interactive)
-- **Environment:** JupyterLab / Jupyter Notebook
-- 
-  ---
-## ⚙️ Project Workflow
-### Phase 1: Problem Definition & Data Inspection
-- Initial data loading, structure inspection (df.info(), df.describe()), and duplicate validation.
+### **Core Objectives:**
+1. Identify primary physiological drivers linked to elevated blood glucose levels.
+2. Evaluate compounding risk patterns between non-modifiable factors (Age) and lifestyle factors (BMI).
+3. Prepare a distribution-preserved dataset using advanced outlier handling rather than destructive row removal.
 
-### Phase 2: Preprocessing & Feature Engineering
-- **Outlier Capping:** Applied Interquartile Range (IQR) boundary capping with .clip() on continuous features to prevent distortion without dropping patient records.
-- **Clinical Binning:** Segmented continuous BMI and Blood Glucose values into standard medical diagnostic categories using pd.cut().
-  
-### Phase 3: Exploratory Data Analysis (EDA)
-- Constructed univariate, bivariate, and multivariate distribution charts across 10+ visualizations.
-- Leveraged interactive Plotly hover elements alongside Seaborn statistical probability plots.
+---
 
-### Phase 4: Executive Insights
-- Summarized key risk drivers, compounding age-BMI relationships, and strategic screening recommendations.
+## 📐 Dataset Architecture
+The raw dataset consists of 50,000 patient rows capturing demographic and diagnostic attributes.
 
-## 💡 Executive Insights
-1. **Primary Indicators:** Blood Glucose and HbA1c exhibit the strongest individual correlation with diabetes status.
-2. **Compound Risk:** High BMI combined with advancing Age multiplies overall metabolic risk significantly.
-3. **Data Integrity:** Sample size (N=50,000) was 100% preserved through boundary capping.
+| Variable Name| Data Type |Range / Description |Clinical Importance|
+| :--- | :--- | :--- | :--- |
+|**Age** | Numerical (Integer) | 18 - 80+ years | Key demographic risk factor |
+|**BMI** | Numerical (Float) | 10.0 - 70.0+ | Measure of body composition |
+|**Blood Glucose** | Numerical (Float) | 70 - 300+ mg/dL | Direct indicator of metabolic function |
+|**HbA1c Level** | Numerical (Float) | 3.5% - 9.0%+ | 3-month average blood sugar levels |
+|**Diabetes Status** | Categorical/Binary | 0 (non-diabetic), 1 (Diabetic) | Target variable |
+
+---
+
+## 🛠️ Key Methodology & Data Cleaning
+
+### 1. Non-Destructive Outlier Handling (.clip())
+Instead of dropping extreme clinical values (which reduces statistical power), an Interquartile Range (IQR) capping methodology was implemented using Pandas .clip().
+
+* **Upper Bound:** $Q3 + 1.5 \times IQR$
+* **Lower Bound:** $Q1 - 1.5 \times IQR$
+
+'''python
+# Capping extreme values to upper and lower IQR boundaries
+Q1 = df['Blood_Glucose'].quantile(0.25)
+Q3 = df['Blood_Glucose'].quantile(0.75)
+IQR = Q3 - Q1
+
+lower_limit = Q1 - 1.5 * IQR
+upper_limit = Q3 + 1.5 * IQR
+
+df['Blood_Glucose'] = df['Blood_Glucose'].clip(lower=lower_limit, upper=upper_limit)
